@@ -1,9 +1,43 @@
 {
   "dependencies": {
-    "child_process": "^1.0.2",
-    "electron": "^27.0.0"
+    "child_process": "^1.0.2"
+  },
+  "devDependencies": {
+    "electron": "^27.0.0",
+    "electron-builder": "^24.6.4"
   },
   "scripts": {
-    "start": "electron main.js"
-  }
+    "start": "electron main.js",
+    "build": "electron-builder --win"
+  },
+  "build": {
+    "appId": "com.jazzysenpai.vrcdnplayer",
+    "win": {
+      "icon": "./build/icon.png"
+    }
+  },
+  "name": "ffplay-gui",
+  "description": "A simple Electron app to wrap around FFPlay to play VRCDN streams without any buffer.",
+  "version": "1.0.0",
+  "main": "main.js",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jazzy348/VRCDN-LowLatency-Player.git"
+  },
+  "keywords": [
+    "vrcdn",
+    "low",
+    "latency",
+    "rtsp",
+    "player",
+    "gui",
+    "desktop",
+    "app"
+  ],
+  "author": "Jazzy Senpai",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jazzy348/VRCDN-LowLatency-Player/issues"
+  },
+  "homepage": "https://github.com/jazzy348/VRCDN-LowLatency-Player#readme"
 }

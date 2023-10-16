@@ -50,5 +50,5 @@ function openFFplay(content) {
   ffPlay.on('close', function (data) {
     processId = 0;
   })
-  ///ffplay -rtsp_transport tcp rtsp://stream.vrcdn.live/live/vrcdn -nostats -flags low_delay -nodisp -probesize 32 -fflags nobuffer+fastseek+flush_packets -analyzeduration 0 -sync ext -af aresample=async=1:min_comp=0.1:first_pts=0
+  
 }
