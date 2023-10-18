@@ -4,14 +4,16 @@ const fs = require('fs')
 const spawn = require('child_process').spawn
 let processId = 0;
 
+let mainWindow;
+
 function createWindow () {
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     webPreferences: {
       preload: path.join(__dirname, 'preload.js')
     },
     autoHideMenuBar: true,
   })
-
+  mainWindow.setIcon('./icon.png')
   ipcMain.on('play-stream', (event, content) => {
     openFFplay(content)
   })
@@ -20,7 +22,7 @@ function createWindow () {
     if (processId !== 0) {
       console.log("Killing FFPlay")
       process.kill(processId)
-    } else {
+      mainWindow.webContents.send("updateStatus", `Status: Idle`)
     }
   })
 
@@ -45,30 +47,27 @@ app.on('windotestw-all-closed', function () {
 
 function openFFplay(content) {
   if (processId !== 0) return;
-  const playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0', '-sync', 'ext', '-af', 'aresample=async=1:min_comp=0.1:first_pts=0']
+  //Removed this as it caused some streams to not work
+  //playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0', '-sync', 'ext', '-af', 'aresample=async=1:min_comp=0.1:first_pts=0']
+  playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0']
   ffPlay = spawn(`ffplay.exe`, playParams)
   processId = ffPlay.pid
-
+  mainWindow.webContents.send("updateStatus", `Status: Playing ${content}`)
   ffPlay.stdout.on('data', function (data) {
-    //onsole.log(data)
+    //console.log(data)
   })
 
   ffPlay.stderr.on('data', function (data) {
     if (data.toString().includes("401 Unauthorized")) {
-      options = {
-        type: "error",
-        buttons: ['Ok'],
-        defaultId: 2,
-        title: "Error",
-        message: "Error opening stream",
-        detail: "The stream you tried to open either does not exist or is not currently live. Please double check the stream name you entered and try again."
-      }
-      dialog.showMessageBox(null, options)
+      processId = 0;
+      mainWindow.webContents.send("updateStatus", `Status: Error playing ${content}, stream does not exist or is offline.`)
     }
   })
 
   ffPlay.on('close', function (data) {
-    processId = 0;
+    if (processId !== 0) {
+      processId = 0;
+      mainWindow.webContents.send("updateStatus", `Status: Idle.`)
+    }
   })
-  
 }

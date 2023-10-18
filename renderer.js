@@ -9,3 +9,7 @@ const stopStream = document.getElementById('stopStream')
 stopStream.addEventListener('click', () => {
     window.electronAPI.stopStream();
 })
+
+window.playStatus.updateStatus((event, playStatus) => {
+    document.getElementById("playStatus").innerText=playStatus
+})

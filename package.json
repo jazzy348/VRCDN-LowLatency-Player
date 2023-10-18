@@ -13,7 +13,7 @@
   "build": {
     "appId": "com.jazzysenpai.vrcdnplayer",
     "win": {
-      "icon": "./build/icon.png"
+      "icon": "./icon.png"
     }
   },
   "name": "ffplay-gui",

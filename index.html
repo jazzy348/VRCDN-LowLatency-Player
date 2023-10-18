@@ -15,14 +15,15 @@
   <head>
     <meta charset="UTF-8">
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>VRCDN Low Latency Audio Player!</title>
+    <title>VRCDN Low Latency Audio Player</title>
   </head>
   <body>
     <center><h1>WARNING!</h1>This app is designed for advanced users only. I will not provide support for this. Good luck!<br><br>
     <input id="rtspUrl" placeholder="Stream Name"/><br>  <br>
     <button id="openStream" type="button">Play</button> <button id="stopStream" type="button">Stop</button>
   </center>
-  
+  <br><br>
+  <div id="playStatus">Status: Idle</div>
     <script src="./renderer.js"></script>
   </body>
 </html>
