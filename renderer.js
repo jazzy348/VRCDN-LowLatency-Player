@@ -12,3 +12,7 @@ window.playStatus.updateStatus((event, playStatus) => {
 window.buttonText.buttonText((event, buttonText) => {
     document.getElementById("playStop").innerHTML=buttonText
 })
+
+window.viewerCount.viewerCount((event, viewerCount) => {
+    document.getElementById("viewerCount").innerHTML=viewerCount
+})
