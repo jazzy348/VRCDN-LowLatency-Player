@@ -18,7 +18,7 @@
   },
   "name": "ffplay-gui",
   "description": "A simple Electron app to wrap around FFPlay to play VRCDN streams without any buffer.",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "main": "main.js",
   "repository": {
     "type": "git",

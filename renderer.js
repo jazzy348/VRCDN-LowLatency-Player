@@ -1,15 +1,14 @@
-const openStream = document.getElementById('openStream')
+const playStop = document.getElementById('playStop')
 const rtspUrl = document.getElementById('rtspUrl')
-openStream.addEventListener('click', () => {
+playStop.addEventListener('click', () => {
     const content = rtspUrl.value
     window.electronAPI.playStream(content)
 })
 
-const stopStream = document.getElementById('stopStream')
-stopStream.addEventListener('click', () => {
-    window.electronAPI.stopStream();
+window.playStatus.updateStatus((event, playStatus) => {
+    document.getElementById("playStatus").innerHTML=playStatus
 })
 
-window.playStatus.updateStatus((event, playStatus) => {
-    document.getElementById("playStatus").innerText=playStatus
+window.buttonText.buttonText((event, buttonText) => {
+    document.getElementById("playStop").innerHTML=buttonText
 })

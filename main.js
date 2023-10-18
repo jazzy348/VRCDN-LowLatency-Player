@@ -18,14 +18,6 @@ function createWindow () {
     openFFplay(content)
   })
 
-  ipcMain.on('stop-stream', (event, content) => {
-    if (processId !== 0) {
-      console.log("Killing FFPlay")
-      process.kill(processId)
-      mainWindow.webContents.send("updateStatus", `Status: Idle`)
-    }
-  })
-
   mainWindow.loadFile('index.html')
 }
 
@@ -46,21 +38,28 @@ app.on('windotestw-all-closed', function () {
 })
 
 function openFFplay(content) {
-  if (processId !== 0) return;
+  if (processId !== 0) {
+      console.log("Killing FFPlay")
+      process.kill(processId)
+      mainWindow.webContents.send("updateStatus", `Status: Idle`)
+      mainWindow.webContents.send("buttonText", `Play`)
+      return;
+  }
   //Removed this as it caused some streams to not work
   //playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0', '-sync', 'ext', '-af', 'aresample=async=1:min_comp=0.1:first_pts=0']
   playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0']
   ffPlay = spawn(`ffplay.exe`, playParams)
   processId = ffPlay.pid
-  mainWindow.webContents.send("updateStatus", `Status: Playing ${content}`)
+  mainWindow.webContents.send("updateStatus", `Status: <font color="cyan">Playing ${content}</font>`)
+  mainWindow.webContents.send("buttonText", `Stop`)
   ffPlay.stdout.on('data', function (data) {
-    //console.log(data)
   })
 
   ffPlay.stderr.on('data', function (data) {
-    if (data.toString().includes("401 Unauthorized")) {
+    if (data.toString().includes("401 Unauthorized") || data.toString().includes("404 Stream Not Found")) {
       processId = 0;
-      mainWindow.webContents.send("updateStatus", `Status: Error playing ${content}, stream does not exist or is offline.`)
+      mainWindow.webContents.send("updateStatus", `Status: <font color="red">Error playing ${content}, stream does not exist or is offline</font>`)
+      mainWindow.webContents.send("buttonText", `Play`)
     }
   })
 
@@ -68,6 +67,7 @@ function openFFplay(content) {
     if (processId !== 0) {
       processId = 0;
       mainWindow.webContents.send("updateStatus", `Status: Idle.`)
+      mainWindow.webContents.send("buttonText", `Play`)
     }
   })
 }
