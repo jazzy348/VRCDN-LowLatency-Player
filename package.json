@@ -16,8 +16,8 @@
       "icon": "./resources/icon.png"
     }
   },
-  "name": "ffplay-gui",
-  "description": "A simple Electron app to wrap around FFPlay to play VRCDN streams without any buffer.",
+  "name": "mpv-gui",
+  "description": "A simple Electron app to wrap around MPV to play VRCDN streams without any buffer.",
   "version": "0.0.3",
   "main": "main.js",
   "repository": {
