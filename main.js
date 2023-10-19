@@ -26,7 +26,6 @@ function createWindow () {
   mainWindow.webContents.on('did-finish-load', () => {
     getAudioDevices()
   })
-
 }
 
 app.whenReady().then(() => {
@@ -92,6 +91,7 @@ async function getAudioDevices() {
     mainWindow.webContents.send("audioDevices", toSend)
   })
 }
+
 //Viewer stuff
 async function getViewers() {
   if (curStream !== "") {
