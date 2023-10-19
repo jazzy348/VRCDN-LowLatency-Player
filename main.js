@@ -2,6 +2,8 @@ const { app, BrowserWindow, ipcMain, dialog } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const spawn = require('child_process').spawn
+const exec = require('child_process').exec
+
 let processId = 0;
 let curStream = "";
 
@@ -14,12 +16,17 @@ function createWindow () {
     },
     autoHideMenuBar: true,
   })
-  mainWindow.setIcon('./icon.png')
+  mainWindow.setIcon('./resources/icon.png')
   ipcMain.on('play-stream', (event, content) => {
-    openFFplay(content)
+    openMpv(content)
   })
 
   mainWindow.loadFile('index.html')
+
+  mainWindow.webContents.on('did-finish-load', () => {
+    getAudioDevices()
+  })
+
 }
 
 app.whenReady().then(() => {
@@ -30,39 +37,38 @@ app.whenReady().then(() => {
   })
 })
 
-app.on('windotestw-all-closed', function () {
+app.on('window-all-closed', function () {
   //if (process.platform !== 'darwin') app.quit()
-  if (processId !== 0) {
-    process.kill(processId)
-  }
   app.quit();
 })
 
-function openFFplay(content) {
+function openMpv(content) {
   if (processId !== 0) {
-      console.log("Killing FFPlay")
+      console.log("Killing Mpv")
       process.kill(processId)
       return;
   }
+  console.log(content)
   //Removed this as it caused some streams to not work
-  //playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0', '-sync', 'ext', '-af', 'aresample=async=1:min_comp=0.1:first_pts=0']
-  playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0']
-  ffPlay = spawn(`ffplay.exe`, playParams)
-  processId = ffPlay.pid
-  mainWindow.webContents.send("updateStatus", `Status: <font color="cyan">Playing ${content}</font>`)
+  //playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0']
+  playParams = [ '--no-video', '--profile=low-latency', `--audio-device=${content.audioDevice}`, '--rtsp-transport=tcp', `rtsp://stream.vrcdn.live/live/${content.streamName}` ]
+  Mpv = spawn(`./lib/mpv/mpv.exe`, playParams)
+  processId = Mpv.pid
+  curStream = content.streamName
+  mainWindow.webContents.send("updateStatus", `Status: <font color="cyan">Playing ${content.streamName}</font>`)
   mainWindow.webContents.send("buttonText", `Stop`)
-  curStream = content
-  ffPlay.stdout.on('data', function (data) {
+  Mpv.stdout.on('data', function (data) {
+    //console.log(data.toString())
   })
 
-  ffPlay.stderr.on('data', function (data) {
+  Mpv.stderr.on('data', function (data) {
     if (data.toString().includes("401 Unauthorized") || data.toString().includes("404 Stream Not Found")) {
       processId = 0;
-      mainWindow.webContents.send("updateStatus", `Status: <font color="red">Error playing ${content}, stream does not exist or is offline</font>`)
+      mainWindow.webContents.send("updateStatus", `Status: <font color="red">Error playing ${content.streamName}, stream does not exist or is offline</font>`)
     }
   })
 
-  ffPlay.on('close', function (data) {
+  Mpv.on('close', function (data) {
     if (processId !== 0) {
       processId = 0;
       mainWindow.webContents.send("updateStatus", `Status: Idle.`)
@@ -70,9 +76,23 @@ function openFFplay(content) {
     mainWindow.webContents.send("buttonText", `Play`)
     mainWindow.webContents.send("viewerCount", `Viewers: 0`)
     curStream = "";
+    console.log(data.toString())
   })
 }
 
+async function getAudioDevices() {
+  exec("mpv --audio-device=help", { cwd: './lib/mpv/'}, function(err, stdout, stderr) {
+    let toSend = []
+    audioDevices = stdout.split(/\r?\n/)
+    audioDevices.forEach(device => {
+      if (device.includes("wasapi")) {
+        toSend.push({"deviceId": device.split(`' `)[0].replace(`  '`, ''), "deviceName": device.split(`' `)[1]})
+      }
+    });
+    mainWindow.webContents.send("audioDevices", toSend)
+  })
+}
+//Viewer stuff
 async function getViewers() {
   if (curStream !== "") {
     fetch("https://api.vrcdn.live/v1/viewers/"+curStream)
@@ -82,7 +102,6 @@ async function getViewers() {
         for (let i = 0; i < resp.viewers.length; i++) {
             total = total + resp['viewers'][i].total
         }
-        console.log(`Sending viewer count: ${total}`)
         mainWindow.webContents.send("viewerCount", `Viewers: ${total}`)
     })
   }
@@ -99,4 +118,6 @@ async function asyncInterval(callback, delay) {
   }
 }
 
+//I leave this loop running even when no stream is being played, this is bad but also the perf hit is so tiny it's meh.
+//I mentioned it was jank, have I convinced you yet? I'll rewrite this properly at some point
 asyncInterval(getViewers.bind(null), 5000);
