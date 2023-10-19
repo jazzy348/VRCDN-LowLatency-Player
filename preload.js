@@ -1,5 +1,8 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
+let audioDevices = {
+  audioDevices: (audioDevices) => ipcRenderer.on("audioDevices", (audioDevices))
+}
 let playStatus = {
   updateStatus: (streamStatus) => ipcRenderer.on("updateStatus", (streamStatus))
 }
@@ -9,6 +12,7 @@ let buttonText = {
 let viewerCount = {
   viewerCount: (viewerCount) => ipcRenderer.on("viewerCount", (viewerCount))
 }
+contextBridge.exposeInMainWorld("audioDevices", audioDevices)
 contextBridge.exposeInMainWorld("playStatus", playStatus)
 contextBridge.exposeInMainWorld("buttonText", buttonText)
 contextBridge.exposeInMainWorld("viewerCount", viewerCount)
