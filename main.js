@@ -50,7 +50,7 @@ function openMpv(content) {
   console.log(content)
   //Removed this as it caused some streams to not work
   //playParams = ['-rtsp_transport', 'tcp', `rtsp://stream.vrcdn.live/live/${content}`, '-nostats', '-flags', 'low_delay', '-nodisp', '-probesize', '32', '-fflags', 'nobuffer+fastseek+flush_packets', '-analyzeduration', '0']
-  playParams = [ '--no-video', '--profile=low-latency', `--audio-device=${content.audioDevice}`, '--rtsp-transport=tcp', `rtsp://stream.vrcdn.live/live/${content.streamName}` ]
+  playParams = [ '--no-video', '--profile=low-latency', '--no-cache', `--audio-device=${content.audioDevice}`, '--rtsp-transport=tcp', `rtsp://192.168.1.140/live/${content.streamName}` ]
   Mpv = spawn(`./lib/mpv/mpv.exe`, playParams)
   processId = Mpv.pid
   curStream = content.streamName
