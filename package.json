@@ -1,6 +1,7 @@
 {
   "dependencies": {
-    "child_process": "^1.0.2"
+    "child_process": "^1.0.2",
+    "node-fetch": "^2.7.0"
   },
   "devDependencies": {
     "electron": "^27.0.0",
@@ -18,7 +19,7 @@
   },
   "name": "mpv-gui",
   "description": "A simple Electron app to wrap around MPV to play VRCDN streams without any buffer.",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "main": "main.js",
   "repository": {
     "type": "git",

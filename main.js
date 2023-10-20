@@ -1,8 +1,9 @@
-const { app, BrowserWindow, ipcMain, dialog } = require('electron')
+const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
 const spawn = require('child_process').spawn
 const exec = require('child_process').exec
+const fetch = require('node-fetch')
 
 let processId = 0;
 let curStream = "";
@@ -25,6 +26,7 @@ function createWindow () {
 
   mainWindow.webContents.on('did-finish-load', () => {
     getAudioDevices()
+    checkUpdate()
   })
 }
 
@@ -90,6 +92,34 @@ async function getAudioDevices() {
     });
     mainWindow.webContents.send("audioDevices", toSend)
   })
+}
+
+async function checkUpdate() {
+  try {
+    data = fs.readFileSync('./version')
+    fetch('https://vrcdnllp.jazzy.land/getVersion', {
+      method: "get",
+      headers: {"User-Agent": `VRCDN-LowLatency-Player - ${data}`}
+    }).then(resp => resp.json())
+    .then(resp => {
+      if (data != resp.version) {
+        options = {
+          type: "info",
+          defaultId: 1,
+          buttons: ['Ok', "Download"],
+          title: "New Version Available",
+          message: "A new version of this app is available, please download it from the repo."
+        }
+        dialog.showMessageBox(null, options).then(data => {
+          if (data.response == 1) {
+            shell.openExternal("https://github.com/jazzy348/VRCDN-LowLatency-Player/releases")
+          }
+        })
+      }
+    })
+  } catch (e) {
+    console.log(e)
+  }
 }
 
 //Viewer stuff
