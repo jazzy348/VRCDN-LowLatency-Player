@@ -1,5 +1,7 @@
 const { contextBridge, ipcRenderer } = require('electron')
 
+//This file exposes the user land stuff to backend stuff
+
 let audioDevices = {
   audioDevices: (audioDevices) => ipcRenderer.on("audioDevices", (audioDevices))
 }
