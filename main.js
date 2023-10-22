@@ -125,15 +125,21 @@ async function checkUpdate() {
 //Viewer stuff
 async function getViewers() {
   if (curStream !== "") {
-    fetch("https://api.vrcdn.live/v1/viewers/"+curStream)
-    .then(resp => resp.json())
-    .then(resp => {
-        let total = 0;
-        for (let i = 0; i < resp.viewers.length; i++) {
-            total = total + resp['viewers'][i].total
-        }
-        mainWindow.webContents.send("viewerCount", `Viewers: ${total}`)
-    })
+    try {
+      fetch("https://api.vrcdn.live/v1/viewers/"+curStream)
+      .then(resp => resp.json())
+      .then(resp => {
+          let total = 0;
+          for (let i = 0; i < resp.viewers.length; i++) {
+              total = total + resp['viewers'][i].total
+          }
+          mainWindow.webContents.send("viewerCount", `Viewers: ${total}`)
+      })
+    } catch (e) {
+      console.log(e)
+      mainWindow.webContents.send("viewerCount", `Error getting viewers`)
+    }
+
   }
 }
 
