@@ -1,3 +1,12 @@
+//Hey hey! Thank you for taking interest in this janky app!
+//I wrote this very quickly after a few Discord DMs from a few VJs when pulling in the performers stream
+//This code is JANK! Feel free to submit a pull request and clean it up. I'll clean it up when I get time
+//Trust in the tiny hats, Jazzy.
+
+//PS. The build process isn't fully automated. After running "npm run build" copy the resources and lib dir to dist/win-unpacked DIR
+//Then write a version file that contains the build version in the dist/win-unpacked dir.
+//Yes, this is awful. Yes I hate it. I will fix it when I get more than 5s to work on this
+
 const { app, BrowserWindow, ipcMain, dialog, shell } = require('electron')
 const path = require('path')
 const fs = require('fs')
@@ -5,9 +14,10 @@ const spawn = require('child_process').spawn
 const exec = require('child_process').exec
 const fetch = require('node-fetch')
 
-let processId = 0;
-let curStream = "";
+let processId = 0; //Keep track of the process ID so we can kill it later
+let curStream = ""; //Used by the viewer grabbing.
 
+//Globally expose the userland window to the full app
 let mainWindow;
 
 function createWindow () {
@@ -24,6 +34,7 @@ function createWindow () {
 
   mainWindow.loadFile('index.html')
 
+  //Once everything has finished rendered, grab the audio devices and check if a new build is available
   mainWindow.webContents.on('did-finish-load', () => {
     getAudioDevices()
     checkUpdate()
@@ -43,7 +54,9 @@ app.on('window-all-closed', function () {
   app.quit();
 })
 
+//Handle spawning the MPV process
 function openMpv(content) {
+  //If MPV already exists, kill it
   if (processId !== 0) {
       console.log("Killing Mpv")
       process.kill(processId)
@@ -58,17 +71,21 @@ function openMpv(content) {
   curStream = content.streamName
   mainWindow.webContents.send("updateStatus", `Status: <font color="cyan">Playing ${content.streamName}</font>`)
   mainWindow.webContents.send("buttonText", `Stop`)
+
   Mpv.stdout.on('data', function (data) {
+    //This isn't used as MPV shouts to STDErr only :Facepalm:
     //console.log(data.toString())
   })
 
   Mpv.stderr.on('data', function (data) {
+    //VRCDN sends 401 or 404 if the stream isn't live. Check for that in the output of MPV and show error if needed
     if (data.toString().includes("401 Unauthorized") || data.toString().includes("404 Stream Not Found")) {
       processId = 0;
       mainWindow.webContents.send("updateStatus", `Status: <font color="red">Error playing ${content.streamName}, stream does not exist or is offline</font>`)
     }
   })
 
+  //If MPV closes for any reason, reset user land button and viewer count
   Mpv.on('close', function (data) {
     if (processId !== 0) {
       processId = 0;
@@ -87,6 +104,7 @@ async function getAudioDevices() {
     audioDevices = stdout.split(/\r?\n/)
     audioDevices.forEach(device => {
       if (device.includes("wasapi")) {
+        //Lets hope MPV doesn't change the output of the devices
         toSend.push({"deviceId": device.split(`' `)[0].replace(`  '`, ''), "deviceName": device.split(`' `)[1]})
       }
     });
@@ -94,6 +112,7 @@ async function getAudioDevices() {
   })
 }
 
+//Check for update, if error then continue
 async function checkUpdate() {
   try {
     data = fs.readFileSync('./version')
@@ -122,7 +141,8 @@ async function checkUpdate() {
   }
 }
 
-//Viewer stuff
+//Grab current viewers from VRCDN's API and send it to user land
+//Honestly, this is kinda pointless...but who knows, maybe I'll repurpose this app is a web radio app :D
 async function getViewers() {
   if (curStream !== "") {
     try {
@@ -139,10 +159,10 @@ async function getViewers() {
       console.log(e)
       mainWindow.webContents.send("viewerCount", `Error getting viewers`)
     }
-
   }
 }
 
+//setTimeout, but async and waits for the function to finish before restarting the wait
 async function asyncInterval(callback, delay) {
   while (true) {
     try {
