@@ -1,38 +1,25 @@
 <!DOCTYPE html>
 <html>
-  <style>
-    body {
-      background-color: rgb(56, 56, 56);
-      color: white;
-    }
-    h1 {
-      color: cyan;
-    }
-    .status {
-      position: absolute;
-      bottom: 0;
-      left: 0;
-      padding: 5px;
-    }
-    .viewerCount {
-      position: absolute;
-      bottom: 0;
-      right: 0;
-      padding: 5px;
-    }
-    </style>
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'">
-    <title>VRCDN Low Latency Audio Player</title>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com;">
+  <title>VRCDN Low Latency Audio Player</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@300&display=swap" rel="stylesheet">
+  <link rel="stylesheet" type="text/css" href="./style.css">
   </head>
   <body>
     <center><h1>WARNING!</h1>This app is designed for advanced users only. I will not provide support for this. Good luck!<br><br>
-    <input id="rtspUrl" placeholder="Stream Name"/> 
-    <select id="audioDevice">
+    <table><tr><td>
+      <input type="text" id="rtspUrl" placeholder="Stream Name"/>
+    </td></tr>
+    <tr><td>
+      <select id="audioDevice">
       
-    </select><br><br>
-    <button id="playStop" type="button">Play</button>
+      </select>
+    </td></tr></table>
+    <button class="cyanButton" id="playStop" type="button">Play</button>
   </center>
   <br><br>
   <div id="playStatus" class="status">Status: Idle</div>

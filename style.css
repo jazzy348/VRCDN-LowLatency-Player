@@ -1,0 +1,65 @@
+body {
+    font-family: 'Rubik', sans-serif;
+    background-color: rgb(56, 56, 56);
+    color: #E8E8E8;
+}
+h1 {
+    color: cyan;
+}
+.status {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    padding: 10px;
+}
+.viewerCount {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    padding: 10px;
+}
+input {
+    border: 0;
+    background-color: rgb(56, 56, 56);
+    width: 100%;
+    color: #E8E8E8;
+}
+select {
+    appearance: none;
+    background-color: rgb(56, 56, 56);
+    border: none;
+    padding: 0 1em 0 0;
+    margin: 0;
+    width: 100%;
+    font-family: inherit;
+    font-size: inherit;
+    cursor: inherit;
+    line-height: inherit;
+    color: #E8E8E8;
+}
+table {
+    border-spacing: 10px;
+    text-align:center;
+}
+td {
+    border: solid #3BE2E2;
+    text-align: center;
+    padding: 5px;
+    padding-bottom: 6px;
+    border-radius: 5px;
+    background-color: rgb(56, 56, 56);
+    color: #E8E8E8;
+}
+.cyanButton{
+    padding: 10px 25px 8px;
+    background-color: #3be2e2;
+    text-shadow: rgba(0,0,0,0.24) 0 1px 0;
+    font-size: 16px;
+    border: 1px solid #3be2e2;
+    border-radius: 2px;
+    cursor:pointer;
+}
+.cyanButton:hover {
+    border: 1px solid #2CA5A5;
+    background-color: #2CA5A5;
+}

@@ -10,7 +10,6 @@ playStop.addEventListener('click', () => {
 //Audio device stuffs
 window.audioDevices.audioDevices((event, audioDevices) => {
     deviceDropdown = document.getElementById("audioDevice")
-    console.log(audioDevices)
     for (var i = 0; i<=audioDevices.length; i++){
         var opt = document.createElement('option');
         opt.value = audioDevices[i].deviceId;
