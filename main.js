@@ -145,7 +145,6 @@ async function checkUpdate() {
 //Honestly, this is kinda pointless...but who knows, maybe I'll repurpose this app is a web radio app :D
 async function getViewers() {
   if (curStream !== "") {
-    try {
       fetch("https://api.vrcdn.live/v1/viewers/"+curStream)
       .then(resp => resp.json())
       .then(resp => {
@@ -154,11 +153,10 @@ async function getViewers() {
               total = total + resp['viewers'][i].total
           }
           mainWindow.webContents.send("viewerCount", `Viewers: ${total}`)
+      }).catch (e => {
+        console.log(e)
+        mainWindow.webContents.send("viewerCount", `Error getting viewers`)
       })
-    } catch (e) {
-      console.log(e)
-      mainWindow.webContents.send("viewerCount", `Error getting viewers`)
-    }
   }
 }
 
